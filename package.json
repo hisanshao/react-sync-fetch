@@ -1,0 +1,58 @@
+{
+  "name": "react-sync-fetch",
+  "version": "1.0.0",
+  "description": "simple fetch with async/await feature",
+  "main": "./lib/index.js",
+  "scripts": {
+    "build": "babel src --out-dir lib --source-maps",
+    "build:watch": "npm run build -- --watch",
+    "clean": "rimraf lib coverage",
+    "prepublish": "npm run clean && npm test && npm run build",
+    "test": "standard --verbose | snazzy && npm run test:coverage",
+    "test:coverage": "babel-node ./node_modules/.bin/isparta cover _mocha -- --recursive test/",
+    "test:unit": "mocha --require babel-register test/",
+    "test:unit:watch": "npm run test:unit -- --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hisanshao/react-sync-fetch.git"
+  },
+  "keywords": [
+    "react",
+    "fetch",
+    "async/await",
+    "redux"
+  ],
+  "author": "sanshao",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hisanshao/react-sync-fetch/issues"
+  },
+  "homepage": "https://github.com/hisanshao/react-sync-fetch#readme",
+  "standard": {
+    "ignore": [
+      "node_modules/*",
+      "lib/*"
+    ]
+  },
+  "dependencies": {
+    "lodash.assign": "^4.2.0"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-eslint": "^7.2.3",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-preset-env": "^1.5.1",
+    "babel-register": "^6.24.1",
+    "babel-runtime": "^6.23.0",
+    "chai": "^4.0.1",
+    "es6-promise": "^4.1.0",
+    "isomorphic-fetch": "^2.2.1",
+    "isparta": "^4.0.0",
+    "mocha": "^3.4.2",
+    "redux": "^3.6.0",
+    "rimraf": "^2.6.1",
+    "snazzy": "^7.0.0",
+    "standard": "^10.0.2"
+  }
+}
