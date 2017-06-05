@@ -5,11 +5,6 @@ import assign from 'lodash/assign'
 const STATUS_REQUEST = 'request'
 const STATUS_SUCCESS = 'success'
 const STATUS_FAILURE = 'failure'
-const fetchMiddleware = createSyncFetchMiddleware()
-let dispatchErrorMiddleware = () => { return false }
-let dispatchError = (callback) => {
-  dispatchErrorMiddleware = callback
-}
 
 let createSyncFetchMiddleware = () => {
   return ({ dispatch, getState }) => next => async (action) => {
@@ -73,6 +68,12 @@ let createSyncFetchMiddleware = () => {
   }
 }
 
+const fetchMiddleware = createSyncFetchMiddleware()
+let dispatchErrorMiddleware = () => { return false }
+let dispatchError = (callback) => {
+  dispatchErrorMiddleware = callback
+}
+
 export default fetchMiddleware
 export {
   STATUS_REQUEST,
@@ -80,4 +81,3 @@ export {
   STATUS_FAILURE,
   dispatchError
 }
-
