@@ -3,6 +3,7 @@ package-lock.json
 .idea/
 .babelrc
 .gitignore
+.npmignore
 .travis.yml
 # Logs
 logs
