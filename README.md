@@ -1,6 +1,6 @@
 # react-sync-fetch
 
-[![Standard - JavaScript Style Guide](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](http://standardjs.com/)
+[![Standard - JavaScript Style Guide](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](http://standardjs.com/)[![Build Status](https://travis-ci.org/hisanshao/react-sync-fetch.svg?branch=master)](https://travis-ci.org/hisanshao/react-sync-fetch)
 
 simple fetch with async/await feature
 
