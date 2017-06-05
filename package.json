@@ -1,10 +1,10 @@
 {
   "name": "react-sync-fetch",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "simple fetch with async/await feature",
   "main": "./lib/index.js",
-  "engines" : {
-    "node" : ">=7.6.0"
+  "engines": {
+    "node": ">=7.6.0"
   },
   "scripts": {
     "build": "babel src --out-dir lib --source-maps",
