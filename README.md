@@ -39,97 +39,38 @@ const composeArray = [
 ]
 const store = compose.apply(Redux, composeArray)(createStore)(reducer)
 
-## utils/fetch.js
-
-import { url } from 'utils'
-import assign from 'lodash/assign'
-
-const wrapAction = (action) => {
-  return assign(action, { credentials: 'same-origin' }, action.method.toUpperCase() === 'POST' ? {
-    endpoint: url(action.endpoint),
-    body: 'data=' + encodeURIComponent(JSON.stringify(action.body) || {}),
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded'
-    }
-  } : {
-    endpoint: url(action.endpoint) + ('&data=' + encodeURIComponent(JSON.stringify(action.requestData || {})))
-  })
-}
-
-const fetchAction = async (api, params) => {
-  let response
-  try {
-    if (params.method.toUpperCase() === 'POST') {
-      response = await fetch(url(api), {
-        credentials: 'same-origin',
-        method: 'post',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: 'data=' + encodeURIComponent(JSON.stringify(params.requestData))
-      })
-    } else {
-      response = await fetch(`${url(api)}&data=${encodeURIComponent(JSON.stringify(params.requestData || {}))}`, {
-        credentials: 'same-origin'
-      })
-    }
-    if (response && response.status >= 400) {
-      return {code: response.status, message: response.statusText}
-    }
-    response = await response.json()
-  } catch (error) {
-    return {code: -1, message: JSON.stringify(error)}
-  }
-  if (!response.success) {
-    return {code: response.code, message: response.msg}
-  }
-  return response.data
-}
-
-export {
-  wrapAction,
-  fetchAction
-}
-
 ## action
-import { fetchAction, wrapAction } from 'utils/fetch'
+import { wrapAction } from 'react-sync-fetch'
 const FETCH_SOMETHING = 'fetch_something'
-const activityActivilegeFetchGetPromotion = (params) => {
-  return wrapAction({
+const fetchGet = (params) => {
+  return {
     type: FETCH_SOMETHING,
     endpoint: '/api',
     requestData: params,
     method: 'GET' // 'GET', 'POST'
-  })
+  }
 }
 
-const test = (params) => {
+const fetchSyncGet = (params) => {
   return {
     type: 'fetch',
     syncEvents: [{
       type: FETCH_SOMETHING,
       endpoint: '/api1',
-      requestData: params,
+      mergeRequestData: (lastResult) => {
+        let requestData = assign(params, lastResult)
+        return requestData
+      },
       method: 'GET' // 'GET', 'POST'
     }, {
       type: FETCH_SOMETHING,
       endpoint: '/api2',
-      requestData: params,
+      mergeRequestData: (lastResult) => {
+        let requestData = assign(params, lastResult)
+        return requestData
+      },
       method: 'GET' // 'GET', 'POST'
-    }],
-    action: async (getState, syncEvents, dispatchRequest, dispatchComplete) => {
-      let data1, data2
-      if (!getState().data1) {
-        dispatchRequest(syncEvents[0])
-        data1 = await fetchAction(syncEvents[0].endpoint, syncEvents[0])
-        dispatchComplete(syncEvents[0], data1)
-      }
-      if (!getState().data2) {
-        dispatchRequest(syncEvents[1])
-        data2 = await fetchAction(syncEvents[1].endpoint, syncEvents[1])
-        dispatchComplete(syncEvents[1], data2)
-      }
-    }
+    }]
   }
 }
 

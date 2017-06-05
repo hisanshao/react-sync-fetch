@@ -56,7 +56,8 @@ let createSyncFetchMiddleware = () => {
         childAction = action.syncEvents[i]
         try {
           childAction.requestData = childAction.mergeRequestData(i === 0 ? {} : results[i - 1])
-          response = await fetch(`${url(childAction.endpoint)}&data=${encodeURIComponent(JSON.stringify(childAction.requestData || {}))}`, childAction)
+          childAction = wrapAction(childAction)
+          response = await fetch(childAction.endpoint, childAction)
           if (response && response.status >= 400) {
             let err = {code: response.status, message: response.statusText}
             throw err
@@ -73,7 +74,8 @@ let createSyncFetchMiddleware = () => {
       }))
       let response
       try {
-        response = await fetch(`${url(action.endpoint)}&data=${encodeURIComponent(JSON.stringify(action.requestData || {}))}`, action)
+        action = wrapAction(action)
+        response = await fetch(action.endpoint, action)
         if (response && response.status >= 400) {
           let err = {code: response.status, message: response.statusText}
           throw err
@@ -92,11 +94,23 @@ let dispatchErrorMiddleware = () => { return false }
 let dispatchError = (callback) => {
   dispatchErrorMiddleware = callback
 }
+let wrapAction = (action) => {
+  return assign(action, { credentials: 'same-origin' }, action.method.toUpperCase() === 'POST' ? {
+    endpoint: url(action.endpoint),
+    body: 'data=' + encodeURIComponent(JSON.stringify(action.body) || {}),
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    }
+  } : {
+    endpoint: url(action.endpoint) + ('&data=' + encodeURIComponent(JSON.stringify(action.requestData || {})))
+  })
+}
 
 export default fetchMiddleware
 export {
   STATUS_REQUEST,
   STATUS_SUCCESS,
   STATUS_FAILURE,
-  dispatchError
+  dispatchError,
+  wrapAction
 }

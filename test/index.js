@@ -123,10 +123,7 @@ describe('redux-fetch middleware', () => {
               type: ACTION_TYPE,
               endpoint: 'http://mock.avosapps.com/leo/1.0/h5/contract/get',
               method: 'GET',
-              requestData: {time: ''},
-              headers: {
-                'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/601.1'
-              }
+              requestData: {time: ''}
             })
           })
 
@@ -155,10 +152,7 @@ describe('redux-fetch middleware', () => {
               type: ACTION_TYPE,
               endpoint: 'http://mock.avosapps.com/test',
               method: 'GET',
-              requestData: {time: ''},
-              headers: {
-                'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/601.1'
-              }
+              requestData: {time: ''}
             })
           })
         })
@@ -196,10 +190,7 @@ describe('redux-fetch middleware', () => {
                   let requestData = assign({time: ''}, lastResult)
                   return requestData
                 },
-                method: 'GET',
-                headers: {
-                  'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/601.1'
-                }
+                method: 'GET'
               }, {
                 type: ACTION_TYPE1,
                 mergeRequestData: (lastResult) => {
@@ -207,10 +198,7 @@ describe('redux-fetch middleware', () => {
                   return requestData
                 },
                 method: 'GET',
-                endpoint: 'http://mock.avosapps.com/leo/1.0/h5/contract/get',
-                headers: {
-                  'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/601.1'
-                }
+                endpoint: 'http://mock.avosapps.com/leo/1.0/h5/contract/get'
               }]
             })
           })
@@ -246,10 +234,7 @@ describe('redux-fetch middleware', () => {
                   let requestData = assign({time: ''}, lastResult)
                   return requestData
                 },
-                method: 'GET',
-                headers: {
-                  'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/601.1'
-                }
+                method: 'GET'
               }, {
                 type: ACTION_TYPE1,
                 mergeRequestData: (lastResult) => {
@@ -257,10 +242,7 @@ describe('redux-fetch middleware', () => {
                   return requestData
                 },
                 method: 'GET',
-                endpoint: 'http://mock.avosapps.com/test',
-                headers: {
-                  'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/601.1'
-                }
+                endpoint: 'http://mock.avosapps.com/test'
               }]
             })
           })
