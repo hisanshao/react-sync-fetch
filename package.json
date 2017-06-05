@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "simple fetch with async/await feature",
   "main": "./lib/index.js",
+  "engines" : {
+    "node" : ">=7.6.0"
+  },
   "scripts": {
     "build": "babel src --out-dir lib --source-maps",
     "build:watch": "npm run build -- --watch",
