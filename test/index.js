@@ -1,6 +1,7 @@
 /* global describe, it */
 
 import chai from 'chai'
+import assign from 'lodash/assign'
 import fetchMiddleware, {
   STATUS_REQUEST,
   STATUS_SUCCESS,
@@ -97,7 +98,7 @@ describe('redux-fetch middleware', () => {
         describe('handle fetch type action', function () {
           const doGetState = () => {}
 
-          it('must dispatch success status action', done => {
+          it('must dispatch success status action', (done) => {
             let count = 0
             const ACTION_TYPE = 'fetchDataSuccess'
             const doDispatch = (action) => {
@@ -114,14 +115,18 @@ describe('redux-fetch middleware', () => {
                   count++
                   break
               }
-
-              if (count === 2) setTimeout(done(), 10000)
+              if (count === 2) done()
             }
             const nextHandler = fetchMiddleware({dispatch: doDispatch, getState: doGetState})
             const actionHandler = nextHandler()
             actionHandler({
               type: ACTION_TYPE,
-              endpoint: 'http://mock.avosapps.com/leo/1.0/h5/contract/get'
+              endpoint: 'http://mock.avosapps.com/leo/1.0/h5/contract/get',
+              method: 'GET',
+              requestData: {time: ''},
+              headers: {
+                'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/601.1'
+              }
             })
           })
 
@@ -138,19 +143,125 @@ describe('redux-fetch middleware', () => {
                   count++
                   break
                 case STATUS_FAILURE:
-                  assert.isDefined(action.error)
+                  assert.typeOf(action.error, 'object')
                   count++
                   break
               }
-
               if (count === 2) done()
             }
             const nextHandler = fetchMiddleware({dispatch: doDispatch, getState: doGetState})
             const actionHandler = nextHandler()
-
             actionHandler({
               type: ACTION_TYPE,
-              endpoint: 'https://api.github.com/users/taberhuang'
+              endpoint: 'http://mock.avosapps.com/test',
+              method: 'GET',
+              requestData: {time: ''},
+              headers: {
+                'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/601.1'
+              }
+            })
+          })
+        })
+        describe('handle fetch sync type action', function () {
+          const doGetState = () => {}
+
+          it('must dispatch success status action', (done) => {
+            let count = 0
+            const ACTION_TYPE = 'fetchDataSuccess'
+            const ACTION_TYPE1 = 'fetchDataSuccess1'
+            const doDispatch = (action) => {
+              assert.typeOf(action.type, 'string')
+              assert.typeOf(action, 'object')
+              assert.typeOf(action.status, 'string')
+
+              switch (action.status) {
+                case STATUS_REQUEST:
+                  count++
+                  break
+                case STATUS_SUCCESS:
+                  assert.typeOf(action.payload, 'object')
+                  count++
+                  break
+              }
+              if (count === 4) done()
+            }
+            const nextHandler = fetchMiddleware({dispatch: doDispatch, getState: doGetState})
+            const actionHandler = nextHandler()
+            actionHandler({
+              type: 'fetch',
+              syncEvents: [{
+                type: ACTION_TYPE,
+                endpoint: 'http://mock.avosapps.com/leo/1.0/h5/contract/get',
+                mergeRequestData: (lastResult) => {
+                  let requestData = assign({time: ''}, lastResult)
+                  return requestData
+                },
+                method: 'GET',
+                headers: {
+                  'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/601.1'
+                }
+              }, {
+                type: ACTION_TYPE1,
+                mergeRequestData: (lastResult) => {
+                  let requestData = assign({time: ''}, lastResult)
+                  return requestData
+                },
+                method: 'GET',
+                endpoint: 'http://mock.avosapps.com/leo/1.0/h5/contract/get',
+                headers: {
+                  'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/601.1'
+                }
+              }]
+            })
+          })
+
+          it('must dispatch failure status action', done => {
+            let count = 0
+            const ACTION_TYPE = 'fetchDataFailure'
+            const ACTION_TYPE1 = 'fetchDataFailure1'
+            const doDispatch = (action) => {
+              assert.typeOf(action.type, 'string')
+              assert.typeOf(action, 'object')
+              assert.typeOf(action.status, 'string')
+
+              switch (action.status) {
+                case STATUS_REQUEST:
+                  count++
+                  break
+                case STATUS_SUCCESS:
+                  assert.typeOf(action.payload, 'object')
+                  count++
+                  break
+              }
+              if (count === 3) done()
+            }
+            const nextHandler = fetchMiddleware({dispatch: doDispatch, getState: doGetState})
+            const actionHandler = nextHandler()
+            actionHandler({
+              type: 'fetch',
+              syncEvents: [{
+                type: ACTION_TYPE,
+                endpoint: 'http://mock.avosapps.com/leo/1.0/h5/contract/get',
+                mergeRequestData: (lastResult) => {
+                  let requestData = assign({time: ''}, lastResult)
+                  return requestData
+                },
+                method: 'GET',
+                headers: {
+                  'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/601.1'
+                }
+              }, {
+                type: ACTION_TYPE1,
+                mergeRequestData: (lastResult) => {
+                  let requestData = assign({time: ''}, lastResult)
+                  return requestData
+                },
+                method: 'GET',
+                endpoint: 'http://mock.avosapps.com/test',
+                headers: {
+                  'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/601.1'
+                }
+              }]
             })
           })
         })
