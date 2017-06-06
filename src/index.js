@@ -43,29 +43,58 @@ function fetchSuccess (dispatch, action, response) {
   }))
   return response.data
 }
-let createSyncFetchMiddleware = () => {
+
+let asyncFunc = async (childAction, dispatch, index, results) => {
+  dispatch(assign({}, childAction, {
+    status: STATUS_REQUEST
+  }))
+  let response
+  try {
+    childAction.requestData = childAction.mergeRequestData(index === 0 ? {} : results[index - 1])
+    childAction = wrapAction(childAction)
+    response = await fetch(childAction.endpoint, childAction)
+    if (response && response.status >= 400) {
+      let err = {code: response.status, message: response.statusText}
+      throw err
+    }
+    response = await response.json()
+    return fetchSuccess(dispatch, childAction, response)
+  } catch (error) {
+    fetchError(dispatch, childAction, error)
+  }
+  return {}
+}
+
+let createFetchMiddleware = () => {
   return ({ dispatch, getState }) => next => async (action) => {
-    if (!action || (!action.endpoint && !action.syncEvents) || action.status) return next(action)
-    if (action && action.syncEvents) {
+    if (!action || (!action.endpoint && !action.funcs) || action.status) return next(action)
+    if (action && action.funcs) {
       let results = []
-      for (let i = 0; i < action.syncEvents.length; i++) {
-        dispatch(assign({}, action, {
-          status: STATUS_REQUEST
-        }))
-        let response, childAction
-        childAction = action.syncEvents[i]
-        try {
-          childAction.requestData = childAction.mergeRequestData(i === 0 ? {} : results[i - 1])
-          childAction = wrapAction(childAction)
-          response = await fetch(childAction.endpoint, childAction)
-          if (response && response.status >= 400) {
-            let err = {code: response.status, message: response.statusText}
-            throw err
+      for (let i = 0; i < action.funcs.length; i++) {
+        if (action.funcs[i].length > 1) {
+          let asyncResult = []
+          await Promise.all(action.funcs[i].map((child) => {
+            asyncResult.push(asyncFunc(child, dispatch, i, results))
+          }))
+        } else {
+          dispatch(assign({}, action, {
+            status: STATUS_REQUEST
+          }))
+          let response, childAction
+          childAction = action.funcs[i] && action.funcs[i][0]
+          try {
+            childAction.requestData = childAction.mergeRequestData(i === 0 ? {} : results[i - 1])
+            childAction = wrapAction(childAction)
+            response = await fetch(childAction.endpoint, childAction)
+            if (response && response.status >= 400) {
+              let err = {code: response.status, message: response.statusText}
+              throw err
+            }
+            response = await response.json()
+            results.push(fetchSuccess(dispatch, childAction, response))
+          } catch (error) {
+            fetchError(dispatch, childAction, error)
           }
-          response = await response.json()
-          results.push(fetchSuccess(dispatch, childAction, response))
-        } catch (error) {
-          fetchError(dispatch, childAction, error)
         }
       }
     } else if (action && action.endpoint) {
@@ -89,7 +118,7 @@ let createSyncFetchMiddleware = () => {
   }
 }
 
-let fetchMiddleware = createSyncFetchMiddleware()
+let fetchMiddleware = createFetchMiddleware()
 let dispatchErrorMiddleware = () => { return false }
 let dispatchError = (callback) => {
   dispatchErrorMiddleware = callback

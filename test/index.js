@@ -183,23 +183,43 @@ describe('redux-fetch middleware', () => {
             const actionHandler = nextHandler()
             actionHandler({
               type: 'fetch',
-              syncEvents: [{
-                type: ACTION_TYPE,
-                endpoint: 'http://mock.avosapps.com/leo/1.0/h5/contract/get',
-                mergeRequestData: (lastResult) => {
-                  let requestData = assign({time: ''}, lastResult)
-                  return requestData
-                },
-                method: 'GET'
-              }, {
-                type: ACTION_TYPE1,
-                mergeRequestData: (lastResult) => {
-                  let requestData = assign({time: ''}, lastResult)
-                  return requestData
-                },
-                method: 'GET',
-                endpoint: 'http://mock.avosapps.com/leo/1.0/h5/contract/get'
-              }]
+              funcs: [
+                [{
+                  type: ACTION_TYPE,
+                  endpoint: 'http://mock.avosapps.com/leo/1.0/h5/contract/get',
+                  mergeRequestData: (lastResult) => {
+                    let requestData = assign({time: ''}, lastResult)
+                    return requestData
+                  },
+                  method: 'GET'
+                }],
+                [{
+                  type: ACTION_TYPE,
+                  endpoint: 'http://mock.avosapps.com/leo/1.0/h5/contract/get',
+                  mergeRequestData: (lastResult) => {
+                    let requestData = assign({time: ''}, lastResult)
+                    return requestData
+                  },
+                  method: 'GET'
+                }, {
+                  type: ACTION_TYPE,
+                  endpoint: 'http://mock.avosapps.com/leo/1.0/h5/contract/get',
+                  mergeRequestData: (lastResult) => {
+                    let requestData = assign({time: ''}, lastResult)
+                    return requestData
+                  },
+                  method: 'GET'
+                }],
+                [{
+                  type: ACTION_TYPE1,
+                  mergeRequestData: (lastResult) => {
+                    let requestData = assign({time: ''}, lastResult[0])
+                    return requestData
+                  },
+                  method: 'GET',
+                  endpoint: 'http://mock.avosapps.com/leo/1.0/h5/contract/get'
+                }]
+              ]
             })
           })
 
@@ -227,23 +247,26 @@ describe('redux-fetch middleware', () => {
             const actionHandler = nextHandler()
             actionHandler({
               type: 'fetch',
-              syncEvents: [{
-                type: ACTION_TYPE,
-                endpoint: 'http://mock.avosapps.com/leo/1.0/h5/contract/get',
-                mergeRequestData: (lastResult) => {
-                  let requestData = assign({time: ''}, lastResult)
-                  return requestData
-                },
-                method: 'GET'
-              }, {
-                type: ACTION_TYPE1,
-                mergeRequestData: (lastResult) => {
-                  let requestData = assign({time: ''}, lastResult)
-                  return requestData
-                },
-                method: 'GET',
-                endpoint: 'http://mock.avosapps.com/test'
-              }]
+              funcs: [
+                [{
+                  type: ACTION_TYPE,
+                  endpoint: 'http://mock.avosapps.com/leo/1.0/h5/contract/get',
+                  mergeRequestData: (lastResult) => {
+                    let requestData = assign({time: ''}, lastResult)
+                    return requestData
+                  },
+                  method: 'GET'
+                }],
+                [{
+                  type: ACTION_TYPE1,
+                  mergeRequestData: (lastResult) => {
+                    let requestData = assign({time: ''}, lastResult)
+                    return requestData
+                  },
+                  method: 'GET',
+                  endpoint: 'http://mock.avosapps.com/test'
+                }]
+              ]
             })
           })
         })
