@@ -34,7 +34,7 @@ function fetchError (dispatch, action, error) {
 
 function fetchSuccess (dispatch, action, response) {
   if (!response.success) {
-    let err = {code: response.code, message: response.message}
+    let err = {code: response.code, message: response.msg}
     throw err
   }
   dispatch(assign({}, action, {
