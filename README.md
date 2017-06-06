@@ -2,7 +2,7 @@
 
 [![Standard - JavaScript Style Guide](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](http://standardjs.com/)[![Build Status](https://travis-ci.org/hisanshao/react-sync-fetch.svg?branch=master)](https://travis-ci.org/hisanshao/react-sync-fetch)
 
-simple fetch with async/await feature
+simple async or sync fetch with async/await feature
 
 # Install
 ```
@@ -51,26 +51,46 @@ const fetchGet = (params) => {
   }
 }
 
-const fetchSyncGet = (params) => {
+const fetchSyncGet = (params, params1, param2, params3) => {
   return {
     type: 'fetch',
-    syncEvents: [{
-      type: FETCH_SOMETHING,
-      endpoint: '/api1',
-      mergeRequestData: (lastResult) => {
-        let requestData = assign(params, lastResult)
-        return requestData
-      },
-      method: 'GET' // 'GET', 'POST'
-    }, {
-      type: FETCH_SOMETHING,
-      endpoint: '/api2',
-      mergeRequestData: (lastResult) => {
-        let requestData = assign(params, lastResult)
-        return requestData
-      },
-      method: 'GET' // 'GET', 'POST'
-    }]
+    syncEvents: [
+      [{
+        type: FETCH_SOMETHING,
+        endpoint: '/api1',
+        mergeRequestData: (lastResult) => {
+          let requestData = assign(params, lastResult)
+          return requestData
+        },
+        method: 'GET' // 'GET', 'POST'
+      }],
+      [{
+        type: FETCH_SOMETHING,
+        endpoint: '/api2',
+        mergeRequestData: (lastResult) => {
+          let requestData = assign(params1, lastResult)
+          return requestData
+        },
+        method: 'GET' // 'GET', 'POST'
+      }, {
+        type: FETCH_SOMETHING,
+        endpoint: '/api3',
+        mergeRequestData: (lastResult) => {
+          let requestData = assign(params2, lastResult)
+          return requestData
+        },
+        method: 'GET' // 'GET', 'POST'
+      }],
+      [{
+        type: FETCH_SOMETHING,
+        endpoint: '/api4',
+        mergeRequestData: (lastResult) => {
+          let requestData = assign(params4, lastResult[0])
+          return requestData
+        },
+        method: 'GET' // 'GET', 'POST'
+      }]
+    ]
   }
 }
 
