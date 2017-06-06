@@ -74,27 +74,16 @@ let createFetchMiddleware = () => {
         if (action.funcs[i].length > 1) {
           let asyncResult = []
           await Promise.all(action.funcs[i].map((child) => {
-            asyncResult.push(asyncFunc(child, dispatch, i, results))
+            ((child) => {
+              asyncResult.push(asyncFunc(child, dispatch, i, results))
+            })(child)
           }))
+          results.push(asyncResult)
         } else {
-          dispatch(assign({}, action, {
-            status: STATUS_REQUEST
-          }))
           let response, childAction
           childAction = action.funcs[i] && action.funcs[i][0]
-          try {
-            childAction.requestData = childAction.mergeRequestData(i === 0 ? {} : results[i - 1])
-            childAction = wrapAction(childAction)
-            response = await fetch(childAction.endpoint, childAction)
-            if (response && response.status >= 400) {
-              let err = {code: response.status, message: response.statusText}
-              throw err
-            }
-            response = await response.json()
-            results.push(fetchSuccess(dispatch, childAction, response))
-          } catch (error) {
-            fetchError(dispatch, childAction, error)
-          }
+          response = await asyncFunc(childAction, dispatch, i, results)
+          results.push(response)
         }
       }
     } else if (action && action.endpoint) {

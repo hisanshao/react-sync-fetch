@@ -99,7 +99,6 @@ describe('redux-fetch middleware', () => {
           const doGetState = () => {}
 
           it('must dispatch success status action', (done) => {
-            let count = 0
             const ACTION_TYPE = 'fetchDataSuccess'
             const doDispatch = (action) => {
               assert.equal(action.type, ACTION_TYPE)
@@ -107,15 +106,11 @@ describe('redux-fetch middleware', () => {
               assert.typeOf(action.status, 'string')
 
               switch (action.status) {
-                case STATUS_REQUEST:
-                  count++
-                  break
                 case STATUS_SUCCESS:
                   assert.typeOf(action.payload, 'object')
-                  count++
+                  done()
                   break
               }
-              if (count === 2) done()
             }
             const nextHandler = fetchMiddleware({dispatch: doDispatch, getState: doGetState})
             const actionHandler = nextHandler()
@@ -128,7 +123,7 @@ describe('redux-fetch middleware', () => {
           })
 
           it('must dispatch failure status action', done => {
-            let count = 0
+            dispatchError(function () { return false })
             const ACTION_TYPE = 'fetchDataFailure'
             const doDispatch = (action) => {
               assert.equal(action.type, ACTION_TYPE)
@@ -136,15 +131,11 @@ describe('redux-fetch middleware', () => {
               assert.typeOf(action.status, 'string')
 
               switch (action.status) {
-                case STATUS_REQUEST:
-                  count++
-                  break
                 case STATUS_FAILURE:
                   assert.typeOf(action.error, 'object')
-                  count++
+                  done()
                   break
               }
-              if (count === 2) done()
             }
             const nextHandler = fetchMiddleware({dispatch: doDispatch, getState: doGetState})
             const actionHandler = nextHandler()
@@ -152,7 +143,7 @@ describe('redux-fetch middleware', () => {
               type: ACTION_TYPE,
               endpoint: 'http://mock.avosapps.com/test',
               method: 'GET',
-              requestData: {time: ''}
+              requestData: {deviceNo: ''}
             })
           })
         })
@@ -169,15 +160,12 @@ describe('redux-fetch middleware', () => {
               assert.typeOf(action.status, 'string')
 
               switch (action.status) {
-                case STATUS_REQUEST:
-                  count++
-                  break
                 case STATUS_SUCCESS:
                   assert.typeOf(action.payload, 'object')
                   count++
+                  if (count === 4) done()
                   break
               }
-              if (count === 4) done()
             }
             const nextHandler = fetchMiddleware({dispatch: doDispatch, getState: doGetState})
             const actionHandler = nextHandler()
@@ -224,24 +212,20 @@ describe('redux-fetch middleware', () => {
           })
 
           it('must dispatch failure status action', done => {
-            let count = 0
+            dispatchError(function () { return false })
             const ACTION_TYPE = 'fetchDataFailure'
             const ACTION_TYPE1 = 'fetchDataFailure1'
             const doDispatch = (action) => {
               assert.typeOf(action.type, 'string')
-              assert.typeOf(action, 'object')
               assert.typeOf(action.status, 'string')
+              assert.typeOf(action, 'object')
 
               switch (action.status) {
-                case STATUS_REQUEST:
-                  count++
-                  break
-                case STATUS_SUCCESS:
-                  assert.typeOf(action.payload, 'object')
-                  count++
+                case STATUS_FAILURE:
+                  assert.typeOf(action.error, 'object')
+                  done()
                   break
               }
-              if (count === 3) done()
             }
             const nextHandler = fetchMiddleware({dispatch: doDispatch, getState: doGetState})
             const actionHandler = nextHandler()
@@ -260,7 +244,7 @@ describe('redux-fetch middleware', () => {
                 [{
                   type: ACTION_TYPE1,
                   mergeRequestData: (lastResult) => {
-                    let requestData = assign({time: ''}, lastResult)
+                    let requestData = assign({deviceNo: 'xd1701034119'}, lastResult)
                     return requestData
                   },
                   method: 'GET',
