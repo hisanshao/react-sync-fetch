@@ -115,7 +115,7 @@ let dispatchError = (callback) => {
 let wrapAction = (action) => {
   return assign(action, { credentials: 'same-origin' }, action.method.toUpperCase() === 'POST' ? {
     endpoint: url(action.endpoint),
-    body: 'data=' + encodeURIComponent(JSON.stringify(action.body) || {}),
+    body: 'data=' + encodeURIComponent(JSON.stringify(action.requestData) || {}),
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded'
     }
