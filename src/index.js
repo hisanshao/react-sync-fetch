@@ -106,23 +106,28 @@ let createFetchMiddleware = () => {
 }
 
 let fetchMiddleware = createFetchMiddleware()
-let dispatchErrorMiddleware = () => { return false }
-let dispatchError = (callback) => {
-  dispatchErrorMiddleware = callback
+let dispatchErrorMiddleware = () => {
+  return false
 }
-let url = (api) => {
+let urlMiddleware = (api) => {
   api += '?t=' + +new Date()
   return api
 }
+let dispatchError = (callback) => {
+  dispatchErrorMiddleware = callback
+}
+let url = (callback) => {
+  urlMiddleware = callback
+}
 let wrapAction = (action) => {
   return assign(action, { credentials: 'same-origin' }, action.method.toUpperCase() === 'POST' ? {
-    endpoint: url(action.endpoint),
+    endpoint: urlMiddleware(action.endpoint),
     body: 'data=' + encodeURIComponent(JSON.stringify(action.requestData) || {}),
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded'
     }
   } : {
-    endpoint: url(action.endpoint) + ('&data=' + encodeURIComponent(JSON.stringify(action.requestData || {})))
+    endpoint: urlMiddleware(action.endpoint) + ('&data=' + encodeURIComponent(JSON.stringify(action.requestData || {})))
   })
 }
 
