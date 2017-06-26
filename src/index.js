@@ -11,19 +11,12 @@ const STATUS_REQUEST = 'request'
 const STATUS_SUCCESS = 'success'
 const STATUS_FAILURE = 'failure'
 
-function url (api) {
-  api += '?t=' + +new Date()
-  return api
-}
-
 function fetchError (dispatch, action, error) {
   if (error && error.code && error.message) {
-    if (!dispatchErrorMiddleware(error)) {
-      dispatch(assign({}, action, {
-        status: STATUS_FAILURE,
-        error: error
-      }))
-    }
+    dispatch(assign({}, action, {
+      status: STATUS_FAILURE,
+      error: error
+    }))
   } else {
     dispatch(assign({}, action, {
       status: STATUS_FAILURE,
@@ -34,8 +27,14 @@ function fetchError (dispatch, action, error) {
 
 function fetchSuccess (dispatch, action, response) {
   if (!response.success) {
-    let err = {code: response.code, message: response.msg}
-    throw err
+    let error = {code: response.code, message: response.msg}
+    if (!dispatchErrorMiddleware(error)) {
+      dispatch(assign({}, action, {
+        status: STATUS_FAILURE,
+        error: error
+      }))
+    }
+    return
   }
   dispatch(assign({}, action, {
     status: STATUS_SUCCESS,
@@ -58,11 +57,10 @@ let asyncFunc = async (childAction, dispatch, index, results) => {
       throw err
     }
     response = await response.json()
-    return fetchSuccess(dispatch, childAction, response)
   } catch (error) {
     fetchError(dispatch, childAction, error)
   }
-  return {}
+  return fetchSuccess(dispatch, childAction, response)
 }
 
 let createFetchMiddleware = () => {
@@ -99,10 +97,10 @@ let createFetchMiddleware = () => {
           throw err
         }
         response = await response.json()
-        fetchSuccess(dispatch, action, response)
       } catch (error) {
         fetchError(dispatch, action, error)
       }
+      fetchSuccess(dispatch, action, response)
     }
   }
 }
@@ -111,6 +109,10 @@ let fetchMiddleware = createFetchMiddleware()
 let dispatchErrorMiddleware = () => { return false }
 let dispatchError = (callback) => {
   dispatchErrorMiddleware = callback
+}
+let url = (api) => {
+  api += '?t=' + +new Date()
+  return api
 }
 let wrapAction = (action) => {
   return assign(action, { credentials: 'same-origin' }, action.method.toUpperCase() === 'POST' ? {
@@ -130,5 +132,6 @@ export {
   STATUS_SUCCESS,
   STATUS_FAILURE,
   dispatchError,
-  wrapAction
+  wrapAction,
+  url
 }
