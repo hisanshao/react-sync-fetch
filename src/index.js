@@ -121,13 +121,13 @@ let url = (callback) => {
 }
 let wrapAction = (action) => {
   return assign(action, { credentials: 'same-origin' }, action.method.toUpperCase() === 'POST' ? {
-    endpoint: urlMiddleware(action.endpoint),
+    endpoint: urlMiddleware(action.endpoint, action.requestData),
     body: 'data=' + encodeURIComponent(JSON.stringify(action.requestData) || {}),
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded'
     }
   } : {
-    endpoint: urlMiddleware(action.endpoint) + ('&data=' + encodeURIComponent(JSON.stringify(action.requestData || {})))
+    endpoint: urlMiddleware(action.endpoint, action.requestData) + ('&data=' + encodeURIComponent(JSON.stringify(action.requestData || {})))
   })
 }
 

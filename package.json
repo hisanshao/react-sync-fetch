@@ -1,6 +1,6 @@
 {
   "name": "react-sync-fetch",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "simple fetch with async/await feature",
   "main": "./lib/index.js",
   "engines": {
