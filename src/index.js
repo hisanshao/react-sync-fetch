@@ -20,12 +20,15 @@ function fetchError (dispatch, action, error) {
   } else {
     dispatch(assign({}, action, {
       status: STATUS_FAILURE,
-      error: {code: -1, message: JSON.stringify(error)}
+      error: {code: -1, message: error && (error.message || error.msg) ? (error.message || error.msg) : JSON.stringify(error)}
     }))
   }
 }
 
 function fetchSuccess (dispatch, action, response) {
+  if (!response) {
+    return null
+  }
   if (!response.success) {
     let error = {code: response.code, message: response.msg}
     if (!dispatchErrorMiddleware(error)) {
@@ -34,7 +37,7 @@ function fetchSuccess (dispatch, action, response) {
         error: error
       }))
     }
-    return
+    return null
   }
   dispatch(assign({}, action, {
     status: STATUS_SUCCESS,
