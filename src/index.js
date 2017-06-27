@@ -58,12 +58,14 @@ let asyncFunc = async (childAction, dispatch, index, results) => {
     if (response && response.status >= 400) {
       let err = {code: response.status, message: response.statusText}
       throw err
+    } else {
+      response = await response.json()
+      return fetchSuccess(dispatch, childAction, response)
     }
-    response = await response.json()
   } catch (error) {
     fetchError(dispatch, childAction, error)
   }
-  return fetchSuccess(dispatch, childAction, response)
+  return null
 }
 
 let createFetchMiddleware = () => {
@@ -98,12 +100,13 @@ let createFetchMiddleware = () => {
         if (response && response.status >= 400) {
           let err = {code: response.status, message: response.statusText}
           throw err
+        } else {
+          response = await response.json()
+          fetchSuccess(dispatch, action, response)
         }
-        response = await response.json()
       } catch (error) {
         fetchError(dispatch, action, error)
       }
-      fetchSuccess(dispatch, action, response)
     }
   }
 }
