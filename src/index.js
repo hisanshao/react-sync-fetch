@@ -10,6 +10,12 @@ if (typeof fetch === 'undefined') {
 const STATUS_REQUEST = 'request'
 const STATUS_SUCCESS = 'success'
 const STATUS_FAILURE = 'failure'
+let config = {
+  credentials: 'same-origin',
+  headers: {
+    'Content-Type': 'application/x-www-form-urlencoded'
+  }
+}
 
 function fetchError (dispatch, action, error) {
   if (error && error.code && error.message) {
@@ -122,16 +128,17 @@ let urlMiddleware = (api) => {
 let dispatchError = (callback) => {
   dispatchErrorMiddleware = callback
 }
+let wrapConfig = (obj) => {
+  config = assign({}, config, obj)
+}
 let url = (callback) => {
   urlMiddleware = callback
 }
 let wrapAction = (action) => {
-  return assign(action, { credentials: 'same-origin' }, action.method.toUpperCase() === 'POST' ? {
+  return assign(action, { credentials: config.credentials }, action.method.toUpperCase() === 'POST' ? {
     endpoint: urlMiddleware(action.endpoint, action.requestData),
     body: 'data=' + encodeURIComponent(JSON.stringify(action.requestData) || {}),
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded'
-    }
+    headers: config.headers
   } : {
     endpoint: urlMiddleware(action.endpoint, action.requestData) + ('&data=' + encodeURIComponent(JSON.stringify(action.requestData || {})))
   })
@@ -143,6 +150,7 @@ export {
   STATUS_SUCCESS,
   STATUS_FAILURE,
   dispatchError,
+  wrapConfig,
   wrapAction,
   url
 }
