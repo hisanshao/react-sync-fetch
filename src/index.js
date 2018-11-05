@@ -135,10 +135,9 @@ let url = (callback) => {
   urlMiddleware = callback
 }
 let wrapAction = (action) => {
-  return assign(action, { credentials: config.credentials }, action.method.toUpperCase() === 'POST' ? {
+  return assign(action, { credentials: config.credentials, headers: config.headers }, action.method.toUpperCase() === 'POST' ? {
     endpoint: urlMiddleware(action.endpoint, action.requestData),
-    body: 'data=' + encodeURIComponent(JSON.stringify(action.requestData) || {}),
-    headers: config.headers
+    body: 'data=' + encodeURIComponent(JSON.stringify(action.requestData) || {})
   } : {
     endpoint: urlMiddleware(action.endpoint, action.requestData) + ('&data=' + encodeURIComponent(JSON.stringify(action.requestData || {})))
   })
