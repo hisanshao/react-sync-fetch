@@ -6,7 +6,7 @@ import fetchMiddleware, {
   STATUS_REQUEST,
   STATUS_SUCCESS,
   STATUS_FAILURE,
-  dispatchError
+  wrapError
 } from '../src/'
 
 const assert = chai.assert
@@ -45,15 +45,15 @@ describe('redux-fetch middleware', () => {
     })
   })
 
-  describe('dispatchError function', () => {
+  describe('wrapError function', () => {
     it('typeof string', () => {
-      assert.typeOf(dispatchError, 'function')
+      assert.typeOf(wrapError, 'function')
     })
-    it('dispatchError() equal false', () => {
-      assert.equal(dispatchError(function () { return false }, false))
+    it('wrapError() equal false', () => {
+      assert.equal(wrapError(function () { return false }, false))
     })
-    it('dispatchError() equal true', () => {
-      assert.equal(dispatchError(function () { return true }, true))
+    it('wrapError() equal true', () => {
+      assert.equal(wrapError(function () { return true }, true))
     })
   })
 
@@ -123,7 +123,7 @@ describe('redux-fetch middleware', () => {
           })
 
           it('must dispatch failure status action', done => {
-            dispatchError(function () { return false })
+            wrapError(function () { return false })
             const ACTION_TYPE = 'fetchDataFailure'
             const doDispatch = (action) => {
               assert.equal(action.type, ACTION_TYPE)
@@ -212,7 +212,7 @@ describe('redux-fetch middleware', () => {
           })
 
           it('must dispatch failure status action', done => {
-            dispatchError(function () { return false })
+            wrapError(function () { return false })
             const ACTION_TYPE = 'fetchDataFailure'
             const ACTION_TYPE1 = 'fetchDataFailure1'
             const doDispatch = (action) => {
