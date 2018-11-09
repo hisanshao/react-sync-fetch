@@ -10,12 +10,6 @@ if (typeof fetch === 'undefined') {
 const STATUS_REQUEST = 'request'
 const STATUS_SUCCESS = 'success'
 const STATUS_FAILURE = 'failure'
-let config = {
-  credentials: 'same-origin',
-  headers: {
-    'Content-Type': 'application/x-www-form-urlencoded'
-  }
-}
 
 function fetchError (dispatch, action, error) {
   if (error && error.code && error.message) {
@@ -37,7 +31,7 @@ function fetchSuccess (dispatch, action, response) {
   }
   if (!response.success) {
     let error = {code: response.code, message: response.msg}
-    if (!dispatchErrorMiddleware(error)) {
+    if (!errorMiddleware(error)) {
       dispatch(assign({}, action, {
         status: STATUS_FAILURE,
         error: error
@@ -118,24 +112,42 @@ let createFetchMiddleware = () => {
 }
 
 let fetchMiddleware = createFetchMiddleware()
-let dispatchErrorMiddleware = () => {
+let errorMiddleware = () => {
   return false
 }
 let urlMiddleware = (api) => {
   api += '?t=' + +new Date()
   return api
 }
-let dispatchError = (callback) => {
-  dispatchErrorMiddleware = callback
+let configMiddleware = () => {
+  return {
+    get: {
+      credentials: 'same-origin',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    },
+    post: {
+      credentials: 'same-origin',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
+    }
+  }
 }
-let wrapConfig = (obj) => {
-  config = assign({}, config, obj)
+let wrapError = (callback) => {
+  errorMiddleware = callback
 }
-let url = (callback) => {
+let wrapConfig = (callback) => {
+  configMiddleware = callback
+}
+let wrapUrl = (callback) => {
   urlMiddleware = callback
 }
 let wrapAction = (action) => {
-  return assign(action, { credentials: config.credentials, headers: config.headers }, action.method.toUpperCase() === 'POST' ? {
+  let cfg = configMiddleware()
+  cfg = cfg[action.method.toLocaleLowerCase()]
+  return assign(action, { credentials: cfg.credentials, headers: cfg.headers }, action.method.toUpperCase() === 'POST' ? {
     endpoint: urlMiddleware(action.endpoint, action.requestData),
     body: 'data=' + encodeURIComponent(JSON.stringify(action.requestData) || {})
   } : {
@@ -148,8 +160,8 @@ export {
   STATUS_REQUEST,
   STATUS_SUCCESS,
   STATUS_FAILURE,
-  dispatchError,
+  wrapError,
   wrapConfig,
   wrapAction,
-  url
+  wrapUrl
 }
